@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interactive Route Planner</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      text-align: center;
+      margin: 0;
+      transition: background 0.5s ease-in-out;
+    }
+    .container {
+      max-width: 500px;
+      margin: 100px auto;
+      background: white;
+      padding: 30px 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 1.5s ease-in-out;
+    }
+    h2 {
+      color: #d9534f;
+      font-size: 24px;
+      animation: popUp 1s ease-in-out;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+    input:focus {
+      border: 2px solid #d9534f;
+      outline: none;
+      animation: pulse 0.5s ease-in-out;
+    }
+    button {
+      background-color: #d9534f;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.2s ease-in-out;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    #darkToggle {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: black;
+      color: white;
+      padding: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      animation: slideIn 0.8s ease-in-out;
+      z-index: 101;
+    }
+
+    .menu-toggle {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background-color: #343a40;
+      color: white;
+      padding: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 101;
+    }
+
+    .sidebar-left {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 280px;
+      height: 100%;
+      background-color: #1e1e1e;
+      color: white;
+      padding: 20px;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+      transition: left 0.3s ease;
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+      text-align: left;
+    }
+    .sidebar-left.show {
+      left: 0;
+    }
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .chatgpt-logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 30%;
+      background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
+      animation: rgb-glow 3s linear infinite;
+    }
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 28px;
+      cursor: pointer;
+    }
+
+    .dark-mode {
+      background-color: #121212;
+      color: white;
+    }
+    .dark-mode .container {
+      background: #222;
+    }
+    .dark-mode .sidebar-left {
+      background-color: #333;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    @keyframes popUp {
+      0% { transform: translateY(-20px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes slideIn {
+      from { transform: translateX(50px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes rgb-glow {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        width: 90%;
+        margin-top: 80px;
+      }
+      .sidebar-left {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Dark Mode Toggle -->
+  <div id="darkToggle" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></div>
+
+  <!-- Sidebar Menu Toggle -->
+  <div class="menu-toggle" onclick="toggleSidebarLeft()">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <!-- Sidebar Left -->
+  <div class="sidebar-left" id="sidebarLeft">
+    <div class="sidebar-header">
+      <div class="chatgpt-logo"></div>
+      <button class="close-btn" onclick="closeSidebar()">&times;</button>
+    </div>
+    <h3>Previous Search</h3>
+    <p><strong>Email:</strong> <span id="prevEmail"></span></p>
+    <p><strong>Start:</strong> <span id="prevStart"></span></p>
+    <p><strong>Destination:</strong> <span id="prevDestination"></span></p>
+    <button onclick="reuseSearch()">Use This Route</button>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+    <h2>Find Your Route</h2>
+    <input type="email" id="email" placeholder="Enter your email" />
+    <input type="text" id="start" placeholder="Enter starting location" />
+    <input type="text" id="destination" placeholder="Enter destination" />
+    <button onclick="showMap()">Show Route</button>
+    <button onclick="useCurrentLocation()">Use Current Location</button>
+  </div>
+
+  <script>
+    // Function to get the user's current location
+    function useCurrentLocation() {
+      if (navigator.geolocation) {
+        // Request the current position
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            // Display the coordinates in the "Start" field
+            document.getElementById("start").value = `Lat: ${lat}, Lng: ${lng}`;
+          },
+          (error) => {
+            alert("Unable to retrieve your location. Please allow location access.");
+          }
+        );
+      } else {
+        alert("Geolocation is not supported by your browser.");
+      }
+    }
+
+    // Function to show the route on Google Maps
+    function showMap() {
+      const email = document.getElementById("email").value;
+      const start = document.getElementById("start").value;
+      const destination = document.getElementById("destination").value;
+
+      if (!email.includes("@")) {
+        alert("Please enter a valid email.");
+        return;
+      }
+      if (!start || !destination) {
+        alert("Please enter both locations.");
+        return;
+      }
+
+      localStorage.setItem("email", email);
+      localStorage.setItem("start", start);
+      localStorage.setItem("destination", destination);
+
+      const mapUrl = `https://www.google.com/maps/dir/${encodeURIComponent(start)}/${encodeURIComponent(destination)}`;
+      window.open(mapUrl, '_blank');
+    }
+
+    function toggleSidebarLeft() {
+      const sidebar = document.getElementById("sidebarLeft");
+      const hasData = localStorage.getItem("email") && localStorage.getItem("start") && localStorage.getItem("destination");
+
+      if (hasData) {
+        document.getElementById("prevEmail").textContent = localStorage.getItem("email");
+        document.getElementById("prevStart").textContent = localStorage.getItem("start");
+        document.getElementById("prevDestination").textContent = localStorage.getItem("destination");
+        sidebar.classList.add("show");
+      } else {
+        alert("No previous search found.");
+      }
+    }
+
+    function closeSidebar() {
+      document.getElementById("sidebarLeft").classList.remove("show");
+    }
+
+    function reuseSearch() {
+      document.getElementById("email").value = localStorage.getItem("email");
+      document.getElementById("start").value = localStorage.getItem("start");
+      document.getElementById("destination").value = localStorage.getItem("destination");
+      closeSidebar();
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+      localStorage.setItem("dark-mode", document.body.classList.contains("dark-mode"));
+    }
+
+    window.onload = () => {
+      if (localStorage.getItem("dark-mode") === "true") {
+        document.body.classList.add("dark-mode");
+      }
+    };
+  </script>
+
+</body>
+</html>

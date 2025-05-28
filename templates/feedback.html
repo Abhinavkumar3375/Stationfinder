@@ -1,0 +1,21 @@
+<!-- feedbacks.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedbacks</title>
+</head>
+<body>
+    <h1>Feedbacks</h1>
+    {% if feedbacks %}
+        <ul>
+        {% for feedback in feedbacks %}
+            <li><strong>{{ feedback.user }}</strong> ({{ feedback.timestamp }}): {{ feedback.message }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No feedback submitted yet.</p>
+    {% endif %}
+</body>
+</html>

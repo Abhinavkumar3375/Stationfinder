@@ -1,0 +1,190 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Station Finder - Find nearby stations easily">
+  <meta name="keywords" content="station finder, transit, bus stops, nearby stations, public transport">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="">
+
+  <title>Station Finder</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <!-- AOS (Animate On Scroll) CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"/>
+
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background-color: #f8f9fa;
+      margin-top: 70px;
+    }
+
+    .navbar {
+      background-color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      color: #007bff !important;
+    }
+
+    .nav-link {
+      color: #343a40 !important;
+      margin-right: 15px;
+      transition: color 0.3s;
+    }
+
+    .nav-link:hover {
+      color: #007bff !important;
+    }
+
+    footer {
+      background-color: #ffffff;
+      padding: 30px 0;
+      margin-top: 50px;
+      border-top: 1px solid #dee2e6;
+    }
+
+    .footer-links a {
+      color: #6c757d;
+      margin: 0 10px;
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      color: #007bff;
+    }
+
+    .copyright {
+      margin-top: 10px;
+      color: #6c757d;
+    }
+
+    #preloader {
+      background: #fff url('/static/loader.gif') no-repeat center center;
+      position: fixed;
+      height: 100vh;
+      width: 100%;
+      z-index: 9999;
+    }
+
+    .dark-mode {
+      background-color: #121212 !important;
+      color: #f1f1f1 !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="/">Station Finder</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+        aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="./home">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./about">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./blogs">Blogs</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./contact">Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./adminpanel">Admin Panel</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Dark Mode Toggle Button -->
+  <div class="text-end container mt-2">
+    <button id="darkModeToggle" class="btn btn-sm btn-outline-dark">Toggle Dark Mode</button>
+  </div>
+
+  <!-- Main content -->
+  <div class="container my-5" data-aos="fade-up">
+    {% block body %}
+    {% endblock %}
+  </div>
+
+  <!-- Footer -->
+  <footer class="text-center">
+    <div class="container">
+      <div class="footer-links mb-2">
+        <a href="{{par['twitter_url']}}" target="_blank"><i class="fab fa-twitter"></i></a>
+        <a href="{{par['fb_url']}}" target="_blank"><i class="fab fa-facebook-f"></i></a>
+        <a href="{{par['github_url']}}" target="_blank"><i class="fab fa-github"></i></a>
+      </div>
+      <p class="copyright">&copy; 2025 Station Finder | <a href="/about">About Us</a></p>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- CKEditor -->
+  <script src="https://cdn.ckeditor.com/4.14.0/standard/ckeditor.js"></script>
+  <script>
+    CKEDITOR.replace('editor1');
+  </script>
+
+  <!-- AOS Init -->
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    AOS.init();
+  </script>
+
+  <!-- Preloader Script -->
+  <script>
+    window.addEventListener('load', () => {
+      document.getElementById('preloader').style.display = 'none';
+    });
+  </script>
+
+  <!-- Dark Mode Toggle -->
+  <script>
+    const toggleBtn = document.getElementById("darkModeToggle");
+    toggleBtn.addEventListener("click", () => {
+      document.body.classList.toggle("dark-mode");
+    });
+  </script>
+
+</body>
+
+</html>

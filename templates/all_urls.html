@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Available Pages</title>
+</head>
+<body>
+    <h1>List of Pages</h1>
+    <ul>
+        <li><a href="{{ url_for('index') }}">Home (/index)</a></li>
+        <li><a href="{{ url_for('home') }}">Home (/home)</a></li>
+        <li><a href="{{ url_for('filter_stops') }}">Filter Stops</a></li>
+        <li><a href="{{ url_for('about') }}">About</a></li>
+        <li><a href="{{ url_for('map') }}">Map</a></li>
+        <li><a href="{{ url_for('chat') }}">Chatbot</a></li>
+        <li><a href="{{ url_for('contact') }}">Contact</a></li>
+        <li><a href="{{ url_for('blogs') }}">Blogs</a></li>
+        <li><a href="{{ url_for('dashboard') }}">User Dashboard</a></li>
+        <li><a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a></li>
+        <li><a href="{{ url_for('login') }}">Login</a></li>
+        <li><a href="{{ url_for('signup') }}">Signup</a></li>
+        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        <li><a href="{{ url_for('success') }}">Success</a></li>
+        <li><a href="{{ url_for('under_construction') }}">Under Construction</a></li>
+        <li><a href="{{ url_for('contributors') }}">Contributors</a></li>
+        <li><a href="{{ url_for('post', post_slug='sample-post') }}">Sample Post (/post/sample-post)</a></li>
+    </ul>
+</body>
+</html>

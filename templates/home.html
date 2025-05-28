@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            padding: 15px 20px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 18px;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar a:hover {
+            color: #f4a261;
+        }
+
+        .image-container {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .image-container img {
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="/home">Station Finder</a>
+        </div>
+        <div class="nav-links">
+            <a href="./about">About</a>
+            <a href="./contact">Contact</a>
+            <a href="/login">Login</a>
+            <a href="/signup">Signup</a>
+        </div>
+    </nav>
+
+    <style>
+        .image-container img {
+            width: 1700%;
+            /* Ensures it is responsive */
+            max-width: 1800px;
+            /* Limits maximum width */
+            height: auto;
+            /* Maintains aspect ratio */
+            display: block;
+            margin: 0 auto;
+            /* Centers the image */
+            border-radius: 10px;
+            /* Optional rounded corners */
+        }
+    </style>
+
+    <div class="image-container">
+        <img src="{{ url_for('static', filename='img/route-management-1.jpg.webp') }}" alt="Route Management">
+    </div>
+
+</body>
+
+</html>

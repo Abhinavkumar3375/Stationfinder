@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Availability Checker</title>
+    <script>
+        function fetchBusData() {
+            let start_stop = document.getElementById("start_stop").value;
+            let end_stop = document.getElementById("end_stop").value;
+
+            fetch(`/process_stops?start_stop=${start_stop}&end_stop=${end_stop}`)
+            .then(response => response.json())
+            .then(data => {
+                let resultSection = document.getElementById("result");
+                let submitButton = document.getElementById("submitButton");
+
+                if (data.message) {
+                    submitButton.innerText = data.message;
+                    resultSection.innerHTML = `<b>${data.message}</b>`;
+                } else {
+                    let busInfo = data.bus_schedules.map(bus => 
+                        `<p>Bus ${bus['Bus ID']} departs at ${bus['Start Time']} and arrives at ${bus['End Time']}</p>`
+                    ).join('');
+
+                    submitButton.innerText = "Check Again";
+                    resultSection.innerHTML = busInfo;
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+                document.getElementById("result").innerHTML = "<b>Error fetching data</b>";
+            });
+        }
+    </script>
+</head>
+<body>
+    <h2>Bus Availability Checker</h2>
+    
+    <label for="start_stop">Start Stop:</label>
+    <input type="text" id="start_stop" placeholder="Enter Start Stop">
+    
+    <label for="end_stop">End Stop:</label>
+    <input type="text" id="end_stop" placeholder="Enter End Stop">
+    
+    <button id="submitButton" onclick="fetchBusData()">Submit</button>
+    
+    <div id="result"></div>
+</body>
+</html>

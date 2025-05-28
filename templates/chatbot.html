@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Station Finder Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='chatbot.css') }}" />
+    <style>
+      /* Basic style for suggestions dropdown */
+      .chat-input-area {
+  position: relative; /* Needed to position suggestions absolutely inside */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+#user-input {
+  flex: 1; /* Take all available space except the button */
+  padding: 10px 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+}
+
+#user-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+#send-btn {
+  padding: 10px 18px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#send-btn:hover {
+  background-color: #0056b3;
+}
+
+#suggestions {
+  position: absolute;
+  top: 100%; /* Right below the input */
+  left: 0;
+  right: 80px; /* Leave space for the send button */
+  max-height: 180px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  z-index: 1000;
+  font-size: 14px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#suggestions div {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#suggestions div:hover {
+  background-color: #f0f8ff;
+}
+
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <header class="chat-header">
+            <h2>Station Finder Bot</h2>
+        </header>
+
+        <ul id="chat-messages" class="chat-messages"></ul>
+
+   <div class="chat-input-area" style="position: relative;">
+    <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off" />
+    <button id="send-btn">Send</button>
+    <div id="suggestions" class="suggestions-box"></div>
+</div>
+
+
+    <script>
+ const input = document.getElementById('user-input');
+const suggestionsBox = document.getElementById('suggestions');
+
+let debounceTimer = null;
+let selectedIndex = -1;
+let currentSuggestions = [];
+
+// Helper: highlight matched substring in suggestion
+function highlightMatch(text, query) {
+  const re = new RegExp(`(${query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
+  return text.replace(re, '<span class="highlight">$1</span>');
+}
+
+function clearSuggestions() {
+  suggestionsBox.innerHTML = '';
+  selectedIndex = -1;
+  currentSuggestions = [];
+}
+
+function renderSuggestions(suggestions, query) {
+  if (suggestions.length === 0) {
+    suggestionsBox.innerHTML = '<div style="padding: 8px;">No suggestions found</div>';
+    return;
+  }
+  suggestionsBox.innerHTML = suggestions.map((item, i) =>
+    `<div class="suggestion-item" data-index="${i}">${highlightMatch(item, query)}</div>`
+  ).join('');
+
+  currentSuggestions = suggestions;
+}
+
+// Fetch autocomplete suggestions from server with debounce
+function fetchSuggestions(query) {
+  if (debounceTimer) clearTimeout(debounceTimer);
+
+  debounceTimer = setTimeout(async () => {
+    if (query.length < 2) {
+      clearSuggestions();
+      return;
+    }
+    try {
+      const res = await fetch(`/autocomplete?query=${encodeURIComponent(query)}`);
+      const data = await res.json();
+      renderSuggestions(data.suggestions || [], query);
+    } catch (err) {
+      console.error('Autocomplete fetch error:', err);
+      clearSuggestions();
+    }
+  }, 300);
+}
+
+// Handle input typing
+input.addEventListener('input', e => {
+  const query = e.target.value.trim();
+  fetchSuggestions(query);
+});
+
+// Handle clicks on suggestions
+suggestionsBox.addEventListener('click', e => {
+  if (e.target && e.target.matches('.suggestion-item')) {
+    const idx = Number(e.target.getAttribute('data-index'));
+    if (!isNaN(idx)) {
+      input.value = currentSuggestions[idx];
+      clearSuggestions();
+      input.focus();
+    }
+  }
+});
+
+// Keyboard navigation: up/down arrow + enter
+input.addEventListener('keydown', e => {
+  const items = suggestionsBox.querySelectorAll('.suggestion-item');
+  if (items.length === 0) return;
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    selectedIndex = (selectedIndex + 1) % items.length;
+    updateHighlight(items);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+    updateHighlight(items);
+  } else if (e.key === 'Enter') {
+    if (selectedIndex >= 0 && selectedIndex < items.length) {
+      e.preventDefault();
+      input.value = currentSuggestions[selectedIndex];
+      clearSuggestions();
+    }
+  }
+});
+
+function updateHighlight(items) {
+  items.forEach((el, idx) => {
+    el.classList.toggle('highlighted', idx === selectedIndex);
+  });
+}
+
+// Hide suggestions if clicking outside
+document.addEventListener('click', e => {
+  if (!input.contains(e.target) && !suggestionsBox.contains(e.target)) {
+    clearSuggestions();
+  }
+});
+
+    </script>
+
+    <script src="{{ url_for('static', filename='chatbot.js') }}"></script>
+
+</body>
+</html>
