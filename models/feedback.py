@@ -1,6 +1,4 @@
-# feedback.py - Optional class to define Feedback structurDGSNGFDRZD
-class Feedback:
-    def __init__(self, user, message, timestamp):
+# feedback.py - Optional class to define Feedback structurHDFXNDHDG
         self.user = user
         self.message = message
         self.timestamp = timestamp
