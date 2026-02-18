@@ -15,7 +15,7 @@ app = Flask(__name__)
 
 
 
-# THE MOODEL SECTION OF THE PAGE 
+# THE MOODEL SECTION OF THE PAGE ========
 
 
 routes_df = pd.read_csv('himachal_routes.csv')
